@@ -1,0 +1,26 @@
+body {
+    background-color: #005F6A;
+    color:lightgray;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 5em;
+}
+cell {
+    width: 64px;
+    aspect-ratio: 1/1;
+    font-size: 300%;
+
+    background-color: bisque;
+    color: darkcyan;
+    border: 4px outset darkgray;
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
