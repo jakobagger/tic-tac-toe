@@ -2,17 +2,55 @@
 
 //#region CONTROLLER
 
+let currentPlayer = 1;
+
 window.addEventListener("load", start);
 
 function start(){
     console.log("up and running");
+    displayBoard();
     makeBoardClickable();
 }
 
 function selectCell(row, col){
-    writeToCell(row, col, 1);
-    displayBoard();
-    console.table(model);
+    if (readFromCell(row, col) === 0){
+        writeToCell(row, col, currentPlayer);
+        displayBoard();
+        console.table(model);
+        nextTurn();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function nextTurn(){
+    if (currentPlayer === 1){
+        currentPlayer = 2;
+        computerTurn();
+    } else if (currentPlayer === 2){
+        currentPlayer = 1;
+        playerTurn();
+    }
+}
+
+function computerTurn(){
+    updateAvailableCells();
+    makeMoveForComputer();
+}
+
+function makeMoveForComputer(){
+    if (availableCells.length === 0){
+        console.log("Game Over, no empty cells!");
+    } else {
+        const index = Math.floor(Math.random() * availableCells.length);
+        const [row, col] = availableCells[index];
+        selectCell(row, col);
+    }
+}
+
+function playerTurn(){
+
 }
 
 //#endregion
@@ -59,12 +97,25 @@ const model = [
     [0,0,0]
 ]
 
+let availableCells = [];
+
 function writeToCell(row, col, value){
     model[row][col] = value;
 }
 
 function readFromCell(row, col){
     return model[row][col];
+}
+
+function updateAvailableCells(){
+    availableCells = [];
+    for (let row = 0; row < 3; row++){
+        for (let col = 0; col < 3; col++){
+            if (readFromCell(row, col) === 0){
+                availableCells.push([row, col]);
+            }
+        }
+    }
 }
 
 //#endregion
