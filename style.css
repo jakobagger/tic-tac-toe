@@ -4,6 +4,13 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 #board {
     display: grid;
     grid-template-columns: repeat(3, max-content);

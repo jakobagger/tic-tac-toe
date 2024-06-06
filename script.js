@@ -35,8 +35,10 @@ function nextTurn(){
 }
 
 function computerTurn(){
+    disableBoardClicks();
     updateAvailableCells();
-    makeMoveForComputer();
+    setTimeout(makeMoveForComputer, 2000)
+    //makeMoveForComputer();
 }
 
 function makeMoveForComputer(){
@@ -50,7 +52,7 @@ function makeMoveForComputer(){
 }
 
 function playerTurn(){
-
+    makeBoardClickable();
 }
 
 //#endregion
@@ -60,6 +62,10 @@ function playerTurn(){
 function makeBoardClickable(){
     document.querySelector("#board")
     .addEventListener("click", boardClicked);
+}
+
+function disableBoardClicks(){
+    document.getElementById("board").removeEventListener("click", boardClicked);
 }
 
 function boardClicked(event){
