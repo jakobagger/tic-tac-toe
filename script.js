@@ -5,6 +5,7 @@
 let currentPlayer = 1;
 
 window.addEventListener("load", start);
+document.getElementById("replay-btn").addEventListener("click", replay);
 
 function start(){
     console.log("up and running");
@@ -25,6 +26,13 @@ function selectCell(row, col){
 }
 
 function nextTurn(){
+
+    if (checkForWin()){
+        console.log(`Game over, player ${currentPlayer} wins!`)
+        endGame();
+        return;
+    }
+
     if (currentPlayer === 1){
         currentPlayer = 2;
         computerTurn();
@@ -53,6 +61,16 @@ function makeMoveForComputer(){
 
 function playerTurn(){
     makeBoardClickable();
+}
+
+function endGame(){
+    disableBoardClicks();
+    displayEndGameMenu();
+}
+
+function replay(){
+    console.log("starting new game");
+    location.reload();
 }
 
 //#endregion
@@ -93,6 +111,11 @@ function displayBoard(){
         }
     }
 }
+
+function displayEndGameMenu(){
+    document.getElementById("end-screen").style.display = 'block';
+}
+
 //#endregion
 
 //#region MODEL
@@ -122,6 +145,48 @@ function updateAvailableCells(){
             }
         }
     }
+}
+
+function checkForWin(){
+    const rowCount = model.length;
+    const colCount = model[0].length;
+
+    for (let i = 0; i < rowCount; i++) {
+        for (let j = 0; j < colCount; j++) {
+            //only check from filled cells
+            if (model[i][j] !== 0) {
+                //check horizontal
+                if (j <= colCount - 3 &&
+                    model[i][j] === model[i][j+1] &&
+                    model[i][j] === model[i][j+2]){
+                        return true;
+                    }
+                //check vertical    
+                if (i <= colCount -3 &&
+                    model[i][j] === model[i+1][j] &&
+                    model[i][j] === model[i+2][j]
+                ){
+                    return true;
+                }
+                //top left to bottom right
+                if (i <= rowCount - 3 && j <= colCount - 3 &&
+                    model[i][j] === model[i+1][j+1] &&
+                    model[i][j] === model[i+2][j+2]
+                ){
+                    return true;
+                }
+                // top right bottom left
+                if (i <= rowCount - 3 && j >= 2 &&
+                    model[i][j] === model[i + 1][j - 1] &&
+                    model[i][j] === model[i + 2][j - 2]
+                    ) {
+                    return true;
+                }
+
+            }   
+        }
+    }
+        return false;
 }
 
 //#endregion
