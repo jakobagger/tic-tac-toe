@@ -232,6 +232,7 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
         let best = -1000;
 
         getAvailableCells().forEach(([row, col]) => {
+            
             model[row][col] = 2; // Assume the computer is player 2
 
             let value = minimax(model, depth + 1, false, alpha, beta);

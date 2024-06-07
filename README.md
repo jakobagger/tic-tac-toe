@@ -1,4 +1,5 @@
 
+![ttt-screenshot](./assets/tictactoe.png)
 
 Deployment: https://jakobagger.github.io/tic-tac-toe/
 
