@@ -34,6 +34,10 @@ body {
     align-items: center;
 }
 
+.target-cell {
+    border: 8px solid red;
+}
+
 #end-screen {
     position: absolute;
     z-index: 101;

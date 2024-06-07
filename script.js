@@ -17,7 +17,7 @@ function selectCell(row, col){
     if (readFromCell(row, col) === 0){
         writeToCell(row, col, currentPlayer);
         displayBoard();
-        console.table(model);
+        //console.table(model);
         nextTurn();
         return true;
     } else {
@@ -27,9 +27,16 @@ function selectCell(row, col){
 
 function nextTurn(){
 
-    if (checkForWin()){
+    const result = checkForWin();
+
+    if (result != 0){
         console.log(`Game over, player ${currentPlayer} wins!`)
-        endGame();
+        endGame(true);
+        return;
+    }
+
+    if (getAvailableCells().length === 0){
+        endGame(result);
         return;
     }
 
@@ -44,12 +51,14 @@ function nextTurn(){
 
 function computerTurn(){
     disableBoardClicks();
-    updateAvailableCells();
-    setTimeout(makeMoveForComputer, 2000)
-    //makeMoveForComputer();
+    //setTimeout(makeRandomMoveForComputer, 2000);
+    setTimeout(makeMinimaxMoveForComputer, 2000);
 }
 
-function makeMoveForComputer(){
+function makeRandomMoveForComputer(){
+
+    const moves = getAvailableCells();
+
     if (availableCells.length === 0){
         console.log("Game Over, no empty cells!");
     } else {
@@ -59,13 +68,20 @@ function makeMoveForComputer(){
     }
 }
 
+function makeMinimaxMoveForComputer(){
+    const move = bestMove();
+        if (move) {
+            selectCell(move.row, move.col);
+    }
+}
+
 function playerTurn(){
     makeBoardClickable();
 }
 
-function endGame(){
+function endGame(result){
     disableBoardClicks();
-    displayEndGameMenu();
+    displayEndGameMenu(result);
 }
 
 function replay(){
@@ -112,7 +128,12 @@ function displayBoard(){
     }
 }
 
-function displayEndGameMenu(){
+function displayEndGameMenu(result){
+    if (result === 0){
+        document.getElementById("result-text").textContent = `Game ends in a tie!`;    
+    } else {
+    document.getElementById("result-text").textContent = `Player ${currentPlayer} wins!`;
+}
     document.getElementById("end-screen").style.display = 'block';
 }
 
@@ -126,7 +147,7 @@ const model = [
     [0,0,0]
 ]
 
-let availableCells = [];
+const availableCells = [];
 
 function writeToCell(row, col, value){
     model[row][col] = value;
@@ -136,8 +157,8 @@ function readFromCell(row, col){
     return model[row][col];
 }
 
-function updateAvailableCells(){
-    availableCells = [];
+function getAvailableCells(){
+    availableCells.length = 0;
     for (let row = 0; row < 3; row++){
         for (let col = 0; col < 3; col++){
             if (readFromCell(row, col) === 0){
@@ -145,6 +166,7 @@ function updateAvailableCells(){
             }
         }
     }
+    return availableCells;
 }
 
 function checkForWin(){
@@ -159,34 +181,129 @@ function checkForWin(){
                 if (j <= colCount - 3 &&
                     model[i][j] === model[i][j+1] &&
                     model[i][j] === model[i][j+2]){
-                        return true;
+                        return model[i][j];
                     }
                 //check vertical    
                 if (i <= colCount -3 &&
                     model[i][j] === model[i+1][j] &&
                     model[i][j] === model[i+2][j]
                 ){
-                    return true;
+                    return model[i][j];
                 }
                 //top left to bottom right
                 if (i <= rowCount - 3 && j <= colCount - 3 &&
                     model[i][j] === model[i+1][j+1] &&
                     model[i][j] === model[i+2][j+2]
                 ){
-                    return true;
+                    return model[i][j];
                 }
                 // top right bottom left
                 if (i <= rowCount - 3 && j >= 2 &&
                     model[i][j] === model[i + 1][j - 1] &&
                     model[i][j] === model[i + 2][j - 2]
                     ) {
-                    return true;
+                        return model[i][j];
                 }
 
             }   
         }
     }
-        return false;
+        return 0;
 }
 
 //#endregion
+
+//#region MINIMAX
+
+const cellScores = [
+    [2, 3, 2],
+    [3, 4, 3],
+    [2, 3, 2]
+];
+
+function minimax(model, depth, isMaximizing, alpha, beta) {
+    const score = evaluate(model);
+
+    if (score === 10) return score - depth; // Consider depth to prefer faster wins
+    if (score === -10) return score + depth; // Consider depth to prefer slower losses
+    if (getAvailableCells(model).length === 0) return 0;
+
+    if (isMaximizing) {
+        let best = -1000;
+
+        getAvailableCells().forEach(([row, col]) => {
+            model[row][col] = 2; // Assume the computer is player 2
+
+            let value = minimax(model, depth + 1, false, alpha, beta);
+            best = Math.max(best, value);
+            alpha = Math.max(alpha, best);
+            model[row][col] = 0; // Undo move
+
+            if (beta <= alpha) {
+                return best;
+            }
+        });
+
+        return best;
+    } else {
+        let best = 1000;
+
+        getAvailableCells().forEach(([row, col]) => {
+            model[row][col] = 1; // Assume the human player is player 1
+
+            let value = minimax(model, depth + 1, true, alpha, beta);
+            best = Math.min(best, value);
+            beta = Math.min(beta, best);
+            model[row][col] = 0; // Undo move
+
+            if (beta <= alpha) {
+                return best;
+            }
+        });
+
+        return best;
+    }
+}
+
+    
+function evaluate(){
+    const winner = checkForWin();
+    if (winner === 2) {
+        return 10;
+    } else if (winner === 1) {
+        return -10;
+    } else {
+        let totalScore = 0;
+
+        for (let row = 0; row < 3; row++){
+            for (let col = 0; col < 3; col++){
+                if (model[row][col] === 2) {
+                    totalScore += cellScores[row][col];
+                } else if (model[row][col] === 1) {
+                    totalScore -= cellScores[row][col];
+                }
+            }
+        }
+        return totalScore;
+    }
+}
+
+function bestMove() {
+    let bestVal = -1000;
+    let move = null;
+
+    getAvailableCells().forEach(([row, col]) => {
+        model[row][col] = 2; // Assume the computer is player 2
+
+        let moveVal = minimax(model, 0, false);
+
+        model[row][col] = 0; // Undo move
+
+        if (moveVal > bestVal) {
+            bestVal = moveVal; // Update the best score
+            move = { row, col }; // Record the move's coordinates
+        }
+    });
+
+    return move;
+}
