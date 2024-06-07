@@ -1,3 +1,4 @@
+### Tic-tac-toe with Alpha-Beta pruning
 
 ![ttt-screenshot](./assets/tictactoe.png)
 
