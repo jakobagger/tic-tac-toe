@@ -59,11 +59,11 @@ function makeRandomMoveForComputer(){
 
     const moves = getAvailableCells();
 
-    if (availableCells.length === 0){
+    if (moves.length === 0){
         console.log("Game Over, no empty cells!");
     } else {
-        const index = Math.floor(Math.random() * availableCells.length);
-        const [row, col] = availableCells[index];
+        const index = Math.floor(Math.random() * moves.length);
+        const [row, col] = moves[index];
         selectCell(row, col);
     }
 }
