@@ -225,7 +225,7 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
     
     
     const score = evaluate(model);
-    console.log(score);
+    //console.log(score);
 
     if (score === 10) return score - depth; // Consider depth to prefer faster wins
     if (score === -10) return score + depth; // Consider depth to prefer slower losses
@@ -234,7 +234,7 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
     if (isMaximizing) {
         let best = -1000;
 
-        console.log(`Current player is maximizing`);
+        //console.log(`Current player is maximizing`);
 
         getAvailableCells(model).forEach(([row, col]) => {
             
@@ -242,10 +242,8 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
 
 
             let value = minimax(model, depth + 1, false, alpha, beta);
-            console.table(model);
-            console.log(value);
+            //console.table(model);
             best = Math.max(best, value);
-            console.log(best);
             alpha = Math.max(alpha, best);
             model[row][col] = 0; // Undo move
 
@@ -258,16 +256,14 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
     } else {
         let best = 1000;
 
-        console.log(`Current player is minimizing`);
+        //console.log(`Current player is minimizing`);
 
         getAvailableCells(model).forEach(([row, col]) => {
             model[row][col] = 1; // Assume the human player is player 1
 
             let value = minimax(model, depth + 1, true, alpha, beta);
             console.table(model);
-            console.log(value);
             best = Math.min(best, value);
-            console.log(best);
             beta = Math.min(beta, best);
         
             model[row][col] = 0; // Undo move
@@ -291,6 +287,7 @@ function evaluate(model){
     } else {
         let totalScore = 0;
 
+        /*
         for (let row = 0; row < 3; row++){
             for (let col = 0; col < 3; col++){
                 if (model[row][col] === 2) {
@@ -300,6 +297,8 @@ function evaluate(model){
                 }
             }
         }
+        */
+
         return totalScore;
     }
 }
