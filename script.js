@@ -27,7 +27,7 @@ function selectCell(row, col){
 
 function nextTurn(){
 
-    const result = checkForWin();
+    const result = checkForWin(model);
 
     if (result != 0){
         console.log(`Game over, player ${currentPlayer} wins!`)
@@ -35,7 +35,7 @@ function nextTurn(){
         return;
     }
 
-    if (getAvailableCells().length === 0){
+    if (getAvailableCells(model).length === 0){
         endGame(result);
         return;
     }
@@ -69,7 +69,7 @@ function makeRandomMoveForComputer(){
 }
 
 function makeMinimaxMoveForComputer(){
-    const move = bestMove();
+    const move = bestMove(model);
         if (move) {
             selectCell(move.row, move.col);
     }
@@ -141,7 +141,7 @@ function displayEndGameMenu(result){
 
 //#region MODEL
 
-const model = [
+let model = [
     [0,0,0],
     [0,0,0],
     [0,0,0]
@@ -157,11 +157,11 @@ function readFromCell(row, col){
     return model[row][col];
 }
 
-function getAvailableCells(){
-    availableCells.length = 0;
-    for (let row = 0; row < 3; row++){
-        for (let col = 0; col < 3; col++){
-            if (readFromCell(row, col) === 0){
+function getAvailableCells(model) {
+    const availableCells = [];
+    for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 3; col++) {
+            if (model[row][col] === 0) {
                 availableCells.push([row, col]);
             }
         }
@@ -169,7 +169,7 @@ function getAvailableCells(){
     return availableCells;
 }
 
-function checkForWin(){
+function checkForWin(model){
     const rowCount = model.length;
     const colCount = model[0].length;
 
@@ -222,7 +222,10 @@ const cellScores = [
 ];
 
 function minimax(model, depth, isMaximizing, alpha, beta) {
+    
+    
     const score = evaluate(model);
+    console.log(score);
 
     if (score === 10) return score - depth; // Consider depth to prefer faster wins
     if (score === -10) return score + depth; // Consider depth to prefer slower losses
@@ -231,12 +234,18 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
     if (isMaximizing) {
         let best = -1000;
 
-        getAvailableCells().forEach(([row, col]) => {
+        console.log(`Current player is maximizing`);
+
+        getAvailableCells(model).forEach(([row, col]) => {
             
             model[row][col] = 2; // Assume the computer is player 2
 
+
             let value = minimax(model, depth + 1, false, alpha, beta);
+            console.table(model);
+            console.log(value);
             best = Math.max(best, value);
+            console.log(best);
             alpha = Math.max(alpha, best);
             model[row][col] = 0; // Undo move
 
@@ -249,12 +258,18 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
     } else {
         let best = 1000;
 
-        getAvailableCells().forEach(([row, col]) => {
+        console.log(`Current player is minimizing`);
+
+        getAvailableCells(model).forEach(([row, col]) => {
             model[row][col] = 1; // Assume the human player is player 1
 
             let value = minimax(model, depth + 1, true, alpha, beta);
+            console.table(model);
+            console.log(value);
             best = Math.min(best, value);
+            console.log(best);
             beta = Math.min(beta, best);
+        
             model[row][col] = 0; // Undo move
 
             if (beta <= alpha) {
@@ -267,8 +282,8 @@ function minimax(model, depth, isMaximizing, alpha, beta) {
 }
 
     
-function evaluate(){
-    const winner = checkForWin();
+function evaluate(model){
+    const winner = checkForWin(model);
     if (winner === 2) {
         return 10;
     } else if (winner === 1) {
@@ -289,14 +304,14 @@ function evaluate(){
     }
 }
 
-function bestMove() {
+function bestMove(model) {
     let bestVal = -1000;
     let move = null;
 
-    getAvailableCells().forEach(([row, col]) => {
+    getAvailableCells(model).forEach(([row, col]) => {
         model[row][col] = 2; // Assume the computer is player 2
 
-        let moveVal = minimax(model, 0, false);
+        let moveVal = minimax(model, 0, false, -1000, 1000);
 
         model[row][col] = 0; // Undo move
 
